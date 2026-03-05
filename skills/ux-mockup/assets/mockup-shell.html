@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{MOCKUP_TITLE}}</title>
+    <style>
+      /*
+       * UX Mockup Shell — provides feedback UI, version history,
+       * and clipboard export. Claude fills in the actual design
+       * content inside each .mockup-section.
+       *
+       * STRUCTURE:
+       *   .mockup-section[data-section-id]
+       *     .section-header  (nav label visible in sticky bar)
+       *     .version-container
+       *       .version[data-version="1"]  (Claude's design content)
+       *       .version[data-version="2"]  (added on iteration)
+       *     .version-nav     (auto-shown when >1 version)
+       *     .feedback-area   (textarea + status)
+       */
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: #f5f5f0;
+        color: #333;
+      }
+
+      /* ── Sticky Nav ── */
+      .mockup-nav {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: #1e1e1e;
+        color: #fff;
+        padding: 10px 16px;
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        align-items: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+      .mockup-nav .title {
+        font-size: 14px;
+        font-weight: 600;
+        margin-right: 12px;
+        white-space: nowrap;
+      }
+      .mockup-nav a {
+        color: #a8c8ff;
+        text-decoration: none;
+        font-size: 12px;
+        padding: 3px 8px;
+        border-radius: 4px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        transition: background 0.15s;
+      }
+      .mockup-nav a:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+      .mockup-nav .copy-all-btn {
+        margin-left: auto;
+        background: #2563eb;
+        color: #fff;
+        border: none;
+        padding: 6px 14px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: inherit;
+        transition: background 0.15s;
+      }
+      .mockup-nav .copy-all-btn:hover {
+        background: #1d4ed8;
+      }
+      .mockup-nav .copy-all-btn.copied {
+        background: #16a34a;
+      }
+
+      /* ── Section layout ── */
+      .mockup-section {
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 0 16px;
+      }
+      .mockup-section.wide {
+        max-width: 800px;
+      }
+
+      .section-label {
+        background: #1e1e1e;
+        color: #fff;
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 12px;
+      }
+      .section-desc {
+        font-size: 13px;
+        color: #888;
+        margin-bottom: 16px;
+        line-height: 1.5;
+      }
+
+      .section-divider {
+        height: 1px;
+        background: #ddd;
+        margin: 48px 0;
+      }
+
+      /* ── Version container ── */
+      .version-container {
+        position: relative;
+      }
+      .version {
+        display: none;
+      }
+      .version.active {
+        display: block;
+      }
+
+      /* ── Version nav ── */
+      .version-nav {
+        display: none; /* shown by JS when >1 version */
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 12px;
+        padding: 8px;
+        background: #fff;
+        border: 1px solid #e5e5e5;
+        border-radius: 8px;
+      }
+      .version-nav.visible {
+        display: flex;
+      }
+      .version-nav button {
+        background: #f3f4f6;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        padding: 4px 12px;
+        font-size: 12px;
+        font-family: inherit;
+        cursor: pointer;
+        color: #374151;
+        transition: all 0.15s;
+      }
+      .version-nav button:hover:not(:disabled) {
+        background: #e5e7eb;
+      }
+      .version-nav button:disabled {
+        opacity: 0.35;
+        cursor: default;
+      }
+      .version-nav .version-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #6b7280;
+        min-width: 80px;
+        text-align: center;
+      }
+
+      /* ── Feedback area ── */
+      .feedback-area {
+        margin-top: 16px;
+        background: #fff;
+        border: 1px solid #e5e5e5;
+        border-radius: 8px;
+        padding: 12px;
+      }
+      .feedback-area label {
+        display: block;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #888;
+        margin-bottom: 6px;
+      }
+      .feedback-area textarea {
+        width: 100%;
+        min-height: 80px;
+        border: 1px solid #e5e5e5;
+        border-radius: 6px;
+        padding: 10px;
+        font-family: inherit;
+        font-size: 14px;
+        line-height: 1.5;
+        resize: vertical;
+        color: #333;
+      }
+      .feedback-area textarea:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      }
+      .feedback-area .char-count {
+        font-size: 11px;
+        color: #aaa;
+        text-align: right;
+        margin-top: 4px;
+      }
+
+      /* ── Design note callouts ── */
+      .design-note {
+        background: #fffbeb;
+        border: 1px solid #fcd34d;
+        border-radius: 8px;
+        padding: 10px 14px;
+        margin: 12px 0;
+        font-size: 12px;
+        color: #92400e;
+        line-height: 1.5;
+      }
+      .design-note strong {
+        font-weight: 600;
+      }
+      .design-note.future {
+        background: #eff6ff;
+        border-color: #93c5fd;
+        color: #1e40af;
+      }
+      .design-note.info {
+        background: #f0fdf4;
+        border-color: #86efac;
+        color: #166534;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="mockup-nav">
+      <span class="title">{{MOCKUP_TITLE}}</span>
+      <!-- NAV_LINKS: Claude generates anchor links here -->
+      {{NAV_LINKS}}
+      <button class="copy-all-btn" onclick="copyAllFeedback()">
+        Copy All Feedback
+      </button>
+    </nav>
+
+    <!-- SECTIONS: Claude generates mockup sections here -->
+    {{SECTIONS}}
+
+    <div style="height: 80px"></div>
+
+    <script>
+      // ── Version History ──
+      function initVersionNav() {
+        document.querySelectorAll(".mockup-section").forEach((section) => {
+          const versions = section.querySelectorAll(".version");
+          const nav = section.querySelector(".version-nav");
+          if (!nav || versions.length <= 1) return;
+
+          nav.classList.add("visible");
+          const label = nav.querySelector(".version-label");
+          const prevBtn = nav.querySelector('[data-dir="prev"]');
+          const nextBtn = nav.querySelector('[data-dir="next"]');
+
+          let current = versions.length; // start on latest
+
+          function show(idx) {
+            versions.forEach((v) => v.classList.remove("active"));
+            versions[idx - 1].classList.add("active");
+            current = idx;
+            label.textContent = `v${idx} of ${versions.length}`;
+            prevBtn.disabled = idx <= 1;
+            nextBtn.disabled = idx >= versions.length;
+          }
+
+          prevBtn.addEventListener("click", () => {
+            if (current > 1) show(current - 1);
+          });
+          nextBtn.addEventListener("click", () => {
+            if (current < versions.length) show(current + 1);
+          });
+
+          show(versions.length); // default to latest
+        });
+      }
+
+      // ── Show first/only version for sections without nav ──
+      document.querySelectorAll(".mockup-section").forEach((section) => {
+        const versions = section.querySelectorAll(".version");
+        if (versions.length === 1) {
+          versions[0].classList.add("active");
+        }
+      });
+
+      initVersionNav();
+
+      // ── Copy All Feedback ──
+      function copyAllFeedback() {
+        const feedback = {};
+        document.querySelectorAll(".mockup-section").forEach((section) => {
+          const id = section.dataset.sectionId;
+          const textarea = section.querySelector("textarea");
+          if (textarea && textarea.value.trim()) {
+            const versions = section.querySelectorAll(".version");
+            const activeVersion = section.querySelector(".version.active");
+            const versionNum = activeVersion
+              ? activeVersion.dataset.version
+              : "1";
+            feedback[id] = {
+              feedback: textarea.value.trim(),
+              viewing_version: parseInt(versionNum),
+              total_versions: versions.length,
+            };
+          }
+        });
+
+        if (Object.keys(feedback).length === 0) {
+          alert("No feedback entered yet. Type in the text areas first.");
+          return;
+        }
+
+        const json = JSON.stringify(
+          {
+            mockup: document.title,
+            timestamp: new Date().toISOString(),
+            sections: feedback,
+          },
+          null,
+          2,
+        );
+
+        navigator.clipboard.writeText(json).then(() => {
+          const btn = document.querySelector(".copy-all-btn");
+          btn.textContent = "Copied!";
+          btn.classList.add("copied");
+          setTimeout(() => {
+            btn.textContent = "Copy All Feedback";
+            btn.classList.remove("copied");
+          }, 2000);
+        });
+      }
+
+      // ── Textarea char counts ──
+      document.querySelectorAll(".feedback-area textarea").forEach((ta) => {
+        const counter = ta.parentElement.querySelector(".char-count");
+        if (!counter) return;
+        ta.addEventListener("input", () => {
+          counter.textContent = ta.value.length
+            ? `${ta.value.length} chars`
+            : "";
+        });
+      });
+    </script>
+  </body>
+</html>
