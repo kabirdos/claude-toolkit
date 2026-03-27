@@ -95,6 +95,7 @@ list_all() {
     list_category "commands"
     list_category "hooks"
     list_category "settings"
+    list_category "statusline"
     list_category "plugins"
 
     echo ""
@@ -152,6 +153,22 @@ install_category() {
     fi
 }
 
+# Install statusline
+install_statusline() {
+    local source="$SCRIPT_DIR/statusline/statusline.sh"
+    local dest="$TARGET_DIR/statusline.sh"
+
+    if [[ ! -f "$source" ]]; then
+        print_warning "No statusline found"
+        return 0
+    fi
+
+    cp "$source" "$dest"
+    chmod +x "$dest"
+    print_success "Installed statusline to $dest"
+    print_info "Add to settings.json: \"statusLine\": { \"type\": \"command\", \"command\": \"$dest\" }"
+}
+
 # Install everything
 install_all() {
     print_info "Installing all components to $TARGET_DIR"
@@ -162,6 +179,8 @@ install_all() {
             install_category "$category"
         fi
     done
+
+    install_statusline
 
     echo ""
     print_success "All components installed!"
@@ -330,6 +349,10 @@ main() {
                 install_category "$category" "${items[@]}"
                 items=()
                 ;;
+            --statusline)
+                shift
+                install_statusline
+                ;;
             --help|-h)
                 echo "Claude Toolkit Installer"
                 echo ""
@@ -343,6 +366,7 @@ main() {
                 echo "  ./install.sh --agents           Install all agents"
                 echo "  ./install.sh --commands         Install all commands"
                 echo "  ./install.sh --hooks            Install all hooks"
+                echo "  ./install.sh --statusline       Install custom statusline"
                 echo ""
                 echo "Examples:"
                 echo "  ./install.sh --skills testing-webapps"
