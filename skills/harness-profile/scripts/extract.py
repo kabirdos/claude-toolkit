@@ -1425,16 +1425,24 @@ def main():
     print("Generating HTML...", file=sys.stderr)
     html = generate_html(data)
 
+    # Save alongside /insights report in ~/.claude/usage-data/
+    usage_dir = CLAUDE_DIR / "usage-data"
+    usage_dir.mkdir(parents=True, exist_ok=True)
+    primary_path = usage_dir / "harness-profile.html"
+    primary_path.write_text(html)
+
+    # Also save a dated copy in ~/Documents/Claude Reports/ if it exists
     reports_dir = Path.home() / "Documents" / "Claude Reports"
-    reports_dir.mkdir(parents=True, exist_ok=True)
-    date_str = datetime.now().strftime("%Y-%m-%d")
-    output_path = reports_dir / f"harness-profile-{date_str}.html"
-    counter = 2
-    while output_path.exists():
-        output_path = reports_dir / f"harness-profile-{date_str}-{counter}.html"
-        counter += 1
-    output_path.write_text(html)
-    print(str(output_path))
+    if reports_dir.exists():
+        date_str = datetime.now().strftime("%Y-%m-%d")
+        dated_path = reports_dir / f"harness-profile-{date_str}.html"
+        counter = 2
+        while dated_path.exists():
+            dated_path = reports_dir / f"harness-profile-{date_str}-{counter}.html"
+            counter += 1
+        dated_path.write_text(html)
+
+    print(str(primary_path))
 
 
 if __name__ == "__main__":
