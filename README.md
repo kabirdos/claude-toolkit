@@ -23,10 +23,27 @@ cd claude-toolkit
 
 ### Skills
 
-| Skill             | Description                                                                               |
-| ----------------- | ----------------------------------------------------------------------------------------- |
-| `testing-webapps` | Test web apps with Claude for Chrome (visual/interactive) or Playwright (automated/CI)    |
-| `frontend-design` | Create distinctive, production-grade frontend interfaces that avoid generic AI aesthetics |
+| Skill             | Description                                                                                                                                                          |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `harness-profile` | Generate a visual report of your Claude Code setup — skills, hooks, CLI tools, agent patterns, and more. Like `/insights` but focused on your harness configuration. |
+| `init`            | Bootstrap new projects with frontend design and skill creation capabilities                                                                                          |
+| `testing-webapps` | Test web apps with Claude for Chrome (visual/interactive) or Playwright (automated/CI)                                                                               |
+| `frontend-design` | Create distinctive, production-grade frontend interfaces that avoid generic AI aesthetics                                                                            |
+
+### Quick Install: Harness Profile
+
+Generate a visual report of how you use Claude Code — no project content exposed, just harness metadata:
+
+```bash
+mkdir -p ~/.claude/skills/harness-profile/scripts && \
+curl -sL https://raw.githubusercontent.com/craigdossantos/claude-toolkit/main/skills/harness-profile/SKILL.md \
+  -o ~/.claude/skills/harness-profile/SKILL.md && \
+curl -sL https://raw.githubusercontent.com/craigdossantos/claude-toolkit/main/skills/harness-profile/scripts/extract.py \
+  -o ~/.claude/skills/harness-profile/scripts/extract.py && \
+open "$(python3 ~/.claude/skills/harness-profile/scripts/extract.py)"
+```
+
+This installs the skill and immediately generates your report. The report saves to `~/.claude/usage-data/harness-profile.html` (alongside the `/insights` report). After installing, you can also run it anytime in Claude Code with `/harness-profile`.
 
 ### Agents
 
@@ -82,6 +99,8 @@ claude-toolkit/
 ├── install.sh          # Installer script
 ├── README.md
 ├── skills/             # Claude Code skills
+│   ├── init/
+│   │   └── SKILL.md
 │   ├── testing-webapps/
 │   │   ├── SKILL.md
 │   │   ├── playwright-patterns.md
