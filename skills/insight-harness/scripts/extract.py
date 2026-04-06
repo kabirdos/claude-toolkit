@@ -11,6 +11,7 @@ For Bash commands, ONLY the first token (command name) is extracted using a safe
 4-step normalizer that strips env var assignments and comment lines.
 """
 
+import hashlib
 import json
 import os
 import re
@@ -961,6 +962,7 @@ def generate_html(data):
     plugins = data["installed_plugins"]
     perms = data["permissions_profile"]
     harness_files = data["harness_files"]
+    integrity_block = json.dumps(data.get("_integrity", {}))  # pre-computed for f-string safety
     custom_agents = data["custom_agents"]
 
     total_sessions = max(meta.get("session_count", 0), jsonl.get("sessions_with_data", 0))
@@ -1461,6 +1463,10 @@ function switchTab(tab) {{
 }}
 </script>
 
+<!-- Integrity manifest: server can extract this JSON block, recompute the SHA-256,
+     and verify the hash matches. Catches casual edits to visible stats. -->
+<script type="application/json" id="insight-harness-integrity">{integrity_block}</script>
+
 </body>
 </html>'''
     return html
@@ -1517,6 +1523,32 @@ def main():
         "jsonl_metadata": jsonl_metadata,
         "permissions_profile": permissions_profile,
         "insights_report": insights_report,
+    }
+
+    # Build integrity manifest — key stats that the server can verify
+    meta = data.get("session_meta_summary", {})
+    jsonl = data.get("jsonl_metadata", {})
+    integrity_payload = {
+        "v": 1,
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "sessions": meta.get("session_count", 0),
+        "total_tokens": meta.get("total_tokens", 0),
+        "total_input_tokens": meta.get("total_input_tokens", 0),
+        "total_output_tokens": meta.get("total_output_tokens", 0),
+        "total_duration_minutes": meta.get("total_duration_minutes", 0),
+        "total_tool_calls": jsonl.get("total_tool_calls", 0),
+        "skill_count": len(data.get("skill_inventory", [])),
+        "hook_count": len(data.get("settings", {}).get("hooks", [])),
+        "plugin_count": len(data.get("installed_plugins", [])),
+        "commit_count": jsonl.get("commit_count", 0),
+        "pr_count": jsonl.get("pr_count", 0),
+        "days": DAYS,
+    }
+    integrity_json = json.dumps(integrity_payload, sort_keys=True, separators=(",", ":"))
+    integrity_hash = hashlib.sha256(integrity_json.encode()).hexdigest()
+    data["_integrity"] = {
+        "payload": integrity_json,
+        "hash": integrity_hash,
     }
 
     print("Generating HTML...", file=sys.stderr)
