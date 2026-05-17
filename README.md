@@ -59,6 +59,38 @@ open "$(python3 ~/.claude/skills/insight-harness/scripts/extract.py)"
 
 ---
 
+## Platform support
+
+This toolkit was built on macOS. Everything works on **macOS** and **Linux** out of the box. **Windows** works too, but a stock Windows machine (PowerShell/CMD only) is missing every dependency — `install.sh` and `statusline.sh` are bash scripts and won't run in PowerShell directly.
+
+### Windows setup
+
+Run the toolkit from **WSL** or **Git Bash** — not native PowerShell. Git Bash is _not_ a Windows default; it ships with [Git for Windows](https://git-scm.com/), a separate install.
+
+A fresh Windows box needs the following. Install the core tier first; the rest as projects require them.
+
+**Core — required for the toolkit to function:**
+
+| Install                                 | Why                                                                                                           |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| [Git for Windows](https://git-scm.com/) | Provides `git` **and Git Bash** — the bash interpreter that runs `.sh` scripts. Bundles `awk`, `sed`, `date`. |
+| [Node.js (LTS)](https://nodejs.org/)    | Runtime for Claude Code, plus `npx tsc` / `npx eslint` / `prettier` used by hooks.                            |
+| Claude Code                             | `npm install -g @anthropic-ai/claude-code`                                                                    |
+| [Python 3](https://www.python.org/)     | Runs the hook scripts under `hooks/`. Check "Add Python to PATH" during install.                              |
+| `jq`                                    | Used by `statusline.sh`. Install with `winget install jqlang.jq` — not bundled with Git for Windows.          |
+
+Run `statusline.sh` via Git Bash. Native PowerShell cannot execute a bare `.sh` file.
+
+**Custom binaries — only if you use the hook presets in `settings/`:**
+
+Some hook presets call external tools (`dcg`, `rtk`) that are _not_ vendored in this repo and have no Windows builds here. If you adopt those presets on Windows, either supply Windows builds of those tools or remove the hook entries that reference them — otherwise affected tool calls will error.
+
+**Partner CLIs — optional, install per project:**
+
+`gh`, `supabase`, `vercel`, `railway`, `wrangler`, `stripe`, `inngest` — each has a Windows installer or `winget`/`npm` package.
+
+---
+
 ## Skills
 
 Each skill has its own README with screenshots, usage examples, and an install command. Start with any of these:
