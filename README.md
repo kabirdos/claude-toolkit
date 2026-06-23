@@ -97,10 +97,11 @@ Each skill has its own README with screenshots, usage examples, and an install c
 
 ### Design & UX
 
-| Skill                                                   | What it does                                                                                                                                                               |
-| ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`ux-mockup`](./skills/ux-mockup/README.md)             | Generate self-contained HTML mockups with per-section feedback textareas, version history, and mobile/desktop toggle. For iterating with stakeholders who don't use Figma. |
-| [`frontend-design`](./skills/frontend-design/README.md) | Create distinctive, production-grade frontend interfaces that avoid generic AI aesthetics. For when you actually want the design to look like someone chose it.            |
+| Skill                                                     | What it does                                                                                                                                                                               |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [`ui-design-review`](./skills/ui-design-review/README.md) | Act as a stand-in UI designer: audit a spec or live design against the principles in _Refactoring UI_, return prioritized fixes each with its reasoning, then render before→after mockups. |
+| [`ux-mockup`](./skills/ux-mockup/README.md)               | Generate self-contained HTML mockups with per-section feedback textareas, version history, and mobile/desktop toggle. For iterating with stakeholders who don't use Figma.                 |
+| [`frontend-design`](./skills/frontend-design/README.md)   | Create distinctive, production-grade frontend interfaces that avoid generic AI aesthetics. For when you actually want the design to look like someone chose it.                            |
 
 ### Testing & QA
 
