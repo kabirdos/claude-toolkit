@@ -21,7 +21,7 @@ You don't _run_ a skill the way you run a script. You either:
 
 1. **Describe what you want in plain English** — _"mock up a new pricing page"_ — and Claude auto-invokes the matching skill, or
 2. **Name the skill explicitly** — _"use the ux-mockup skill to..."_ — when you want to force a specific one, or
-3. **Use a slash command** — some skills expose themselves as `/skill-name` (e.g. `/handoff`, `/insight-harness`). Type `/` in Claude Code to see what's available.
+3. **Use a slash command** — some skills expose themselves as `/skill-name` (e.g. `/handoff`). Type `/` in Claude Code to see what's available.
 
 After installing a skill, verify it's there by running `ls ~/.claude/skills` (for global) or `ls .claude/skills` (for project-local). Claude Code also loads skills at session start, so restart your conversation if you just installed one.
 
@@ -43,19 +43,6 @@ cd claude-toolkit
 ```
 
 The installer **copies files** into your target directory — it doesn't symlink, doesn't download anything else, and doesn't touch files outside the target. Read it before running if you want: [`install.sh`](./install.sh). To uninstall, delete the skill's directory under `.claude/skills/`.
-
-### One-line install for insight-harness only
-
-If you just want to try [`insight-harness`](./skills/insight-harness/README.md) without cloning:
-
-```bash
-mkdir -p ~/.claude/skills/insight-harness/scripts && \
-curl -sL https://raw.githubusercontent.com/craigdossantos/claude-toolkit/main/skills/insight-harness/SKILL.md \
-  -o ~/.claude/skills/insight-harness/SKILL.md && \
-curl -sL https://raw.githubusercontent.com/craigdossantos/claude-toolkit/main/skills/insight-harness/scripts/extract.py \
-  -o ~/.claude/skills/insight-harness/scripts/extract.py && \
-open "$(python3 ~/.claude/skills/insight-harness/scripts/extract.py)"
-```
 
 ---
 
@@ -128,12 +115,11 @@ Each skill has its own README with screenshots, usage examples, and an install c
 
 ### Reporting & setup
 
-| Skill                                                       | What it does                                                                                                                                                          |
-| ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`html-report`](./skills/html-report/README.md)             | Convert research or analysis content into a polished NYTimes-editorial-style HTML page.                                                                               |
-| [`video-course-site`](./skills/video-course-site/README.md) | Turn a folder of video files into a tabbed static site: transcribe locally with whisper.cpp → blog posts in the teacher's voice → single-page site.                   |
-| [`insight-harness`](./skills/insight-harness/README.md)     | Superset of `/insights` — generates a comprehensive profile of your Claude Code harness (token usage, tool breakdowns, skill inventory, hooks) over the last 30 days. |
-| [`init`](./skills/init/README.md)                           | Bootstrap a new project with frontend-design and skill-creation capabilities turned on.                                                                               |
+| Skill                                                       | What it does                                                                                                                                        |
+| ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`html-report`](./skills/html-report/README.md)             | Convert research or analysis content into a polished NYTimes-editorial-style HTML page.                                                             |
+| [`video-course-site`](./skills/video-course-site/README.md) | Turn a folder of video files into a tabbed static site: transcribe locally with whisper.cpp → blog posts in the teacher's voice → single-page site. |
+| [`init`](./skills/init/README.md)                           | Bootstrap a new project with frontend-design and skill-creation capabilities turned on.                                                             |
 
 ### Meta / infrastructure
 
@@ -167,7 +153,7 @@ Each skill folder contains:
 - **`SKILL.md`** — the instructions Claude reads when the skill is invoked. Written for Claude, not for humans.
 - **`README.md`** — the human-facing docs (what you're reading now is the repo-level one). Every skill has its own.
 - **`assets/`** — screenshots, template HTML, or other static files the skill references.
-- **`scripts/`** — helper scripts for skills that shell out (e.g. `video-course-site`, `insight-harness`).
+- **`scripts/`** — helper scripts for skills that shell out (e.g. `video-course-site`).
 
 ---
 
