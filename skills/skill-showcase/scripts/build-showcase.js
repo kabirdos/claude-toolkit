@@ -497,12 +497,7 @@ const DEFAULT_GROUPS = {
     "research-orchestrator",
   ],
   "Planning & documents": ["prd", "handoff", "ralph"],
-  "Reporting & setup": [
-    "html-report",
-    "video-course-site",
-    "insight-harness",
-    "init",
-  ],
+  "Reporting & setup": ["html-report", "video-course-site", "init"],
   "Meta / infrastructure": ["skill-showcase"],
 };
 

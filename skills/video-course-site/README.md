@@ -53,4 +53,3 @@ After install, Claude will invoke this skill automatically when you mention "cou
 ## See also
 
 - [`ux-mockup`](../ux-mockup/README.md) — same self-contained HTML pattern, but for iterating on designs with stakeholder feedback
-- [`insight-harness`](../insight-harness/README.md) — another "one HTML file is the deliverable" skill, pointed at your own Claude Code usage data
